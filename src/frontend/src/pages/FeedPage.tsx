@@ -10,12 +10,11 @@ import { useListArticles } from "../hooks/useQueries";
 
 const CATEGORIES = [
   "All",
-  "World",
-  "Politics",
-  "Technology",
-  "Sports",
-  "Entertainment",
-  "Science",
+  "Work Orders",
+  "MOU",
+  "Capacity Additions",
+  "Acquisitions",
+  "Other",
 ];
 
 const SKELETON_KEYS = ["sk1", "sk2", "sk3", "sk4", "sk5", "sk6"];
@@ -72,14 +71,14 @@ export function FeedPage() {
         <div className="ink-divider mb-4" />
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <h1 className="font-display text-3xl font-bold tracking-tight">
-            Top Stories
+            Market Updates
           </h1>
           <div className="relative max-w-sm w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               value={searchText}
               onChange={(e) => handleSearch(e.target.value)}
-              placeholder="Search stories..."
+              placeholder="Search..."
               className="pl-9 rounded-none"
               data-ocid="feed.search_input"
             />
@@ -131,12 +130,12 @@ export function FeedPage() {
           <div className="text-center py-24" data-ocid="feed.empty_state">
             <Rss className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="font-display text-xl font-semibold mb-2">
-              No stories found
+              No items found
             </h3>
             <p className="text-muted-foreground">
               {debouncedSearch
-                ? `No articles matching "${debouncedSearch}"`
-                : "No articles in this category yet."}
+                ? `No results matching "${debouncedSearch}"`
+                : "No items in this category yet."}
             </p>
           </div>
         )}

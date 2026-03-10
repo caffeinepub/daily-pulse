@@ -14,12 +14,11 @@ import { useState } from "react";
 import type { Article } from "../backend.d";
 
 const CATEGORIES = [
-  "World",
-  "Politics",
-  "Technology",
-  "Sports",
-  "Entertainment",
-  "Science",
+  "Work Orders",
+  "MOU",
+  "Capacity Additions",
+  "Acquisitions",
+  "Other",
 ];
 
 interface ArticleFormProps {
@@ -45,7 +44,7 @@ export function ArticleForm({
   const [title, setTitle] = useState(initial?.title ?? "");
   const [summary, setSummary] = useState(initial?.summary ?? "");
   const [body, setBody] = useState(initial?.body ?? "");
-  const [category, setCategory] = useState(initial?.category ?? "World");
+  const [category, setCategory] = useState(initial?.category ?? "Work Orders");
   const [author, setAuthor] = useState(initial?.author ?? "");
   const [imageUrl, setImageUrl] = useState(initial?.imageUrl ?? "");
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -80,7 +79,7 @@ export function ArticleForm({
           id="title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="Article headline"
+          placeholder="Entry headline"
           data-ocid="article_form.title_input"
           className="rounded-none"
         />
@@ -119,7 +118,7 @@ export function ArticleForm({
           id="body"
           value={body}
           onChange={(e) => setBody(e.target.value)}
-          placeholder="Full article content"
+          placeholder="Full content"
           rows={8}
           data-ocid="article_form.body_textarea"
           className="rounded-none resize-none"
@@ -190,11 +189,7 @@ export function ArticleForm({
           data-ocid="article_form.submit_button"
         >
           {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {isPending
-            ? "Saving..."
-            : initial
-              ? "Update Article"
-              : "Publish Article"}
+          {isPending ? "Saving..." : initial ? "Update Entry" : "Publish Entry"}
         </Button>
         <Button
           type="button"

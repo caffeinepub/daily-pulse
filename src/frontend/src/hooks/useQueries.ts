@@ -41,6 +41,19 @@ export function useIsAdmin() {
   });
 }
 
+export function useClaimAdmin() {
+  const { actor } = useActor();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async () => {
+      if (!actor) throw new Error("Not connected");
+      const success = await actor.claimAdminAccess();
+      if (!success) throw new Error("Admin already claimed by another user");
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["isAdmin"] }),
+  });
+}
+
 export function useCreateArticle() {
   const { actor } = useActor();
   const qc = useQueryClient();

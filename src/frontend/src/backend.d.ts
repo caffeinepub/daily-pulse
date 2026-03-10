@@ -28,6 +28,7 @@ export enum UserRole {
 }
 export interface backendInterface {
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
+    claimAdminAccess(): Promise<boolean>;
     createArticle(title: string, summary: string, body: string, category: string, author: string, imageUrl: string): Promise<bigint>;
     deleteArticle(id: bigint): Promise<void>;
     getArticle(id: bigint): Promise<Article | null>;

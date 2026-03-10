@@ -111,6 +111,7 @@ export enum UserRole {
 export interface backendInterface {
     _initializeAccessControlWithSecret(userSecret: string): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
+    claimAdminAccess(): Promise<boolean>;
     createArticle(title: string, summary: string, body: string, category: string, author: string, imageUrl: string): Promise<bigint>;
     deleteArticle(id: bigint): Promise<void>;
     getArticle(id: bigint): Promise<Article | null>;
@@ -150,6 +151,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.assignCallerUserRole(arg0, to_candid_UserRole_n1(this._uploadFile, this._downloadFile, arg1));
+            return result;
+        }
+    }
+    async claimAdminAccess(): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.claimAdminAccess();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.claimAdminAccess();
             return result;
         }
     }

@@ -12,13 +12,23 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
-import { Eye, EyeOff, Pencil, Plus, Shield, Trash2 } from "lucide-react";
+import {
+  Eye,
+  EyeOff,
+  Loader2,
+  Pencil,
+  Plus,
+  Shield,
+  Trash2,
+} from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { toast } from "sonner";
 import type { Article } from "../backend.d";
 import { ArticleForm } from "../components/ArticleForm";
+import { useInternetIdentity } from "../hooks/useInternetIdentity";
 import {
+  useClaimAdmin,
   useCreateArticle,
   useDeleteArticle,
   useIsAdmin,
@@ -31,11 +41,17 @@ type ViewMode = "list" | "create" | "edit";
 const ADMIN_SKELETON_KEYS = ["as1", "as2", "as3", "as4", "as5"];
 
 export function AdminPage() {
-  const { data: isAdmin, isLoading: isAdminLoading } = useIsAdmin();
+  const {
+    data: isAdmin,
+    isLoading: isAdminLoading,
+    refetch: refetchIsAdmin,
+  } = useIsAdmin();
   const { data: articles, isLoading } = useListArticles(null, null);
   const createMutation = useCreateArticle();
   const updateMutation = useUpdateArticle();
   const deleteMutation = useDeleteArticle();
+  const claimAdminMutation = useClaimAdmin();
+  const { identity } = useInternetIdentity();
 
   const [mode, setMode] = useState<ViewMode>("list");
   const [editingArticle, setEditingArticle] = useState<Article | null>(null);
@@ -51,15 +67,58 @@ export function AdminPage() {
   }
 
   if (!isAdmin) {
+    async function handleClaimAdmin() {
+      if (!identity) {
+        toast.error("Please sign in first.");
+        return;
+      }
+      try {
+        await claimAdminMutation.mutateAsync();
+        toast.success("Admin access granted!");
+        refetchIsAdmin();
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : "Failed to claim admin access.";
+        toast.error(message);
+      }
+    }
+
     return (
       <main className="container max-w-5xl mx-auto px-4 py-24 text-center">
-        <Shield className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-        <h2 className="font-display text-2xl font-bold mb-2">
-          Admin Access Required
-        </h2>
-        <p className="text-muted-foreground">
-          You must be signed in as an administrator to view this page.
-        </p>
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="flex flex-col items-center gap-4"
+        >
+          <div className="w-16 h-16 bg-primary/10 flex items-center justify-center">
+            <Shield className="w-8 h-8 text-primary" />
+          </div>
+          <h2 className="font-display text-2xl font-bold">
+            Setup Admin Access
+          </h2>
+          <p className="text-muted-foreground max-w-sm">
+            Click below to claim admin access for your account.
+          </p>
+          <Button
+            onClick={handleClaimAdmin}
+            disabled={claimAdminMutation.isPending}
+            className="rounded-none bg-primary text-primary-foreground hover:bg-primary/90 gap-2 mt-2"
+            data-ocid="admin.claim_button"
+          >
+            {claimAdminMutation.isPending ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Claiming...
+              </>
+            ) : (
+              <>
+                <Shield className="w-4 h-4" />
+                Claim Admin Access
+              </>
+            )}
+          </Button>
+        </motion.div>
       </main>
     );
   }

@@ -1,13 +1,12 @@
 import { Button } from "@/components/ui/button";
-import { Link, useRouter } from "@tanstack/react-router";
-import { LogIn, LogOut, Newspaper, Shield } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { LogIn, LogOut, Shield } from "lucide-react";
 import { useInternetIdentity } from "../hooks/useInternetIdentity";
-import { useIsAdmin } from "../hooks/useQueries";
 
 export function Navigation() {
   const { login, clear, loginStatus, identity } = useInternetIdentity();
-  const isLoggedIn = loginStatus === "success" && !!identity;
-  const { data: isAdmin } = useIsAdmin();
+  const isLoggedIn = !!identity;
+  const isInitializing = loginStatus === "initializing";
 
   return (
     <header className="sticky top-0 z-50 bg-background border-b-2 border-foreground">
@@ -39,12 +38,16 @@ export function Navigation() {
                 variant="ghost"
                 size="sm"
                 onClick={login}
-                disabled={loginStatus === "logging-in"}
+                disabled={loginStatus === "logging-in" || isInitializing}
                 className="text-xs h-7 gap-1.5 text-muted-foreground hover:text-foreground"
                 data-ocid="nav.login_button"
               >
                 <LogIn className="w-3 h-3" />
-                {loginStatus === "logging-in" ? "Signing in..." : "Sign In"}
+                {isInitializing
+                  ? "Loading..."
+                  : loginStatus === "logging-in"
+                    ? "Signing in..."
+                    : "Sign In"}
               </Button>
             )}
           </div>
@@ -58,15 +61,17 @@ export function Navigation() {
           data-ocid="nav.home_link"
           className="flex items-center gap-3 group"
         >
-          <div className="w-10 h-10 bg-primary flex items-center justify-center">
-            <Newspaper className="w-5 h-5 text-primary-foreground" />
-          </div>
+          <img
+            src="/assets/uploads/ChatGPT-Image-Mar-11-2026-01_18_15-AM-1.png"
+            alt="Market W.I.P Logo"
+            className="h-12 w-auto object-contain bg-white rounded p-1 drop-shadow-sm"
+          />
           <div>
             <span className="font-display text-2xl font-bold tracking-tight text-foreground">
-              Daily Pulse
+              Market W.I.P
             </span>
             <p className="text-xs text-muted-foreground tracking-widest uppercase leading-none">
-              The world in focus
+              Work In Progress
             </p>
           </div>
         </Link>
@@ -83,7 +88,7 @@ export function Navigation() {
               </Button>
             )}
           </Link>
-          {isAdmin && (
+          {isLoggedIn && (
             <Link
               to="/admin"
               data-ocid="nav.admin_link"
